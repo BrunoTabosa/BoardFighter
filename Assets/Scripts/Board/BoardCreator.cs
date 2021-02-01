@@ -5,18 +5,16 @@ using UnityEngine;
 public class BoardCreator : MonoBehaviour
 {
     public GameObject tilePrefab;
-    public Tile[,] tiles;
 
     private void Start()
     {
-        Create(16, 16);
+       //Create(16, 16);
     }
 
-
-    public void Create(int x, int y)
+    public Tile[,] Create(int x, int y)
     {
-        tiles = new Tile[x, y];
-        Vector3 position = Vector3.zero;
+        Tile[,] tiles = new Tile[x, y];
+        Vector3 position = new Vector3(0, -0.5f, 0); //-0.5f so the character keeps at 0,0,0;
         GameObject go;
       
         for (int i = 0; i < x; i++)
@@ -29,5 +27,6 @@ public class BoardCreator : MonoBehaviour
                 tiles[i, j].go = go;
             }
         }
+        return tiles;
     }
 }
