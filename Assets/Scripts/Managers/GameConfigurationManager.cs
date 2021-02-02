@@ -5,7 +5,6 @@ using UnityEngine.SceneManagement;
 
 public class GameConfigurationManager : Singleton<GameConfigurationManager>
 {
-
     public IEnumerator Initialize()
     {
         

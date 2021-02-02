@@ -1,8 +1,8 @@
 ﻿public class PlayerTurnState
 {
-    CharacterController characterController;
+    PlayerController characterController;
 
-    public PlayerTurnState(CharacterController controller)
+    public PlayerTurnState(PlayerController controller)
     {
         characterController = controller;
     }

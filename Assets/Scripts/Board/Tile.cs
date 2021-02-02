@@ -6,4 +6,5 @@ public struct Tile
 {
     public int playerTeam;
     public GameObject go;
+    public int x, y;
 }

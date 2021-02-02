@@ -25,6 +25,8 @@ public class BoardCreator : MonoBehaviour
                 position.z = j;
                 go = GameObject.Instantiate(tilePrefab, position, Quaternion.identity, this.transform);
                 tiles[i, j].go = go;
+                tiles[i, j].x = i;
+                tiles[i, j].y = j;
             }
         }
         return tiles;
