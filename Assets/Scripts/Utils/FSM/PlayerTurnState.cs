@@ -1,10 +1,12 @@
-﻿public class PlayerTurnState
+﻿public class PlayerTurnState : State
 {
     PlayerController characterController;
+    GameManager gameManager;
 
-    public PlayerTurnState(PlayerController controller)
+    public PlayerTurnState(PlayerController controller, GameManager manager)
     {
         characterController = controller;
+        gameManager = manager;
     }
     public virtual void Enter()
     {

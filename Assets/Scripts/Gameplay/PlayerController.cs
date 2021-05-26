@@ -13,6 +13,10 @@ public class PlayerController : MonoBehaviour
     public int remaingActions;
     public int maximumActionsPerTurn;
     public int team = -1;
+    public int dicesToRoll = 3;
+    
+    public int health;
+    public int attack;
 
     public void Init(Character characterPrefab, int newTeam)
     {
@@ -24,7 +28,12 @@ public class PlayerController : MonoBehaviour
     public void MoveTo(Tile tile)
     {
         currentTile = tile;
-        character.FaceAndMove(tile.x, tile.y);
         remaingActions--;
+        character.FaceAndMove(tile.x, tile.y);
+    }
+
+    public void SetInBattle(bool value)
+    {
+        character.SetBattleMode(value);
     }
 }

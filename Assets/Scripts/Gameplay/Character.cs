@@ -36,7 +36,32 @@ public class Character : MonoBehaviour
         target = new Vector3(x, 0, y);
         transform.LookAt(target);
         transform.position = target;
+        StartCoroutine(OnMoveComplete());
+    }
 
+    IEnumerator OnMoveComplete()
+    {
+        yield return new WaitForSecondsRealtime(0.5f);
         GameManager.OnMoveComplete();
+    }
+
+    public void SetBattleMode(bool value)
+    {
+        animator.SetBool("InBattle", value);
+    }
+
+    public void PlayAttack()
+    {
+        animator.SetTrigger("Attack");
+    }
+
+    public void AttackHitResponse()
+    {
+
+    }
+
+    public void PlayReceiveHit()
+    {
+        animator.SetTrigger("Attack");
     }
 }

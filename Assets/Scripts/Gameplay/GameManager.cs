@@ -8,8 +8,11 @@ public class GameManager : MonoBehaviour
     public PlayerController controllerPrefab;
     public Character[] characterPrefab;
     public BoardManager boardManager;
+    public BattleManager battleManager;
 
     PlayerController[] playerControllers;
+    PlayerController currentPlayer;
+    int currentPlayerId = 0;
 
     public static Action OnMoveComplete; 
 
@@ -22,16 +25,27 @@ public class GameManager : MonoBehaviour
     GameObject selectedObject;
     //--
 
+    //Turn State Machine
+    StateMachine stateMachine;
+
+
+    //-----
+
     public void Start()
     {
         InitCharacters(2);
         camera = Camera.main;
         OnMoveComplete += OnMoveFinished;
+
+        stateMachine = new StateMachine();
+        SetupPlayerTurn(0);
     }
 
     private void Update()
     {
         HandleInput();
+
+        stateMachine.currentState?.Update();
     }
 
     void InitCharacters(int characters)
@@ -51,10 +65,10 @@ public class GameManager : MonoBehaviour
         playerControllers[0].currentTile = boardManager.tiles[1, 1];
         boardManager.SetTileTeam(1, 1, 1);
 
-        playerControllers[1] = Instantiate(controllerPrefab, new Vector3(15, 0, 15), Quaternion.identity);
+        playerControllers[1] = Instantiate(controllerPrefab, new Vector3(4, 0, 4), Quaternion.identity);
         playerControllers[1].Init(characterPrefab[0], 2);
-        playerControllers[1].currentTile = boardManager.tiles[15, 15];
-        boardManager.SetTileTeam(15, 15, 2);
+        playerControllers[1].currentTile = boardManager.tiles[4, 4];
+        boardManager.SetTileTeam(4, 4, 2);
     }
 
     void HandleInput()
@@ -67,23 +81,45 @@ public class GameManager : MonoBehaviour
         {
             selectedObject = hitData.transform.gameObject;
             //selectedObject.GetComponent<Renderer>().material.color = Color.green;
+            int x = (int)selectedObject.transform.position.x;
+            int y = (int)selectedObject.transform.position.z;
 
-
-            var selectedTile = boardManager.GetTileAt((int)selectedObject.transform.position.x, (int)selectedObject.transform.position.z);
-            if(CanMove(playerControllers[0], playerControllers[0].currentTile, selectedTile) && playerControllers[0].remaingActions > 0)
+            var selectedTile = boardManager.GetTileAt(x, y);
+            if(CanMove(currentPlayer, currentPlayer.currentTile, selectedTile) && currentPlayer.remaingActions > 0)
             {
-                playerControllers[0].MoveTo(selectedTile);
-                selectedTile.playerTeam = playerControllers[0].team;
+                boardManager.MoveCharacter(currentPlayer.currentTile, selectedTile, currentPlayer);
+                currentPlayer.MoveTo(selectedTile);
             }
         }
     }
 
     void OnMoveFinished()
     {
-        if(CheckIfEnemiesNearby(playerControllers[0].currentTile, playerControllers[0].team))
+        if(CheckIfEnemiesNearby(currentPlayer.currentTile, currentPlayer.team))
         {
-
+            //refactor for only nearby characters
+            foreach (var c in playerControllers)
+            {
+                c.SetInBattle(true);
+            }
+            print("move finisehd with enemy nearby");
+            battleManager.Battle(playerControllers[0], playerControllers[1]);
+            
         }
+        else
+        {
+            //refactor for only nearby characters
+            foreach (var c in playerControllers)
+            {
+                c.SetInBattle(false);
+            }
+        }
+        
+        if(currentPlayer.remaingActions <= 0)
+        {
+            OnEndPlayerTurn();
+        }
+
     }
 
     bool CheckIfEnemiesNearby(Tile tile, int playerTeam)
@@ -113,6 +149,21 @@ public class GameManager : MonoBehaviour
         }
         return false;
     }
+
+    public void OnEndPlayerTurn()
+    {
+        print("OnEndPlayerTurn");
+        //Goes to next player or to first
+        currentPlayerId = currentPlayerId + 1 >= playerControllers.Length ? 0 : currentPlayerId + 1;
+        SetupPlayerTurn(currentPlayerId);
+    }
     
+    void SetupPlayerTurn(int id)
+    {
+        currentPlayerId = id;
+        currentPlayer = playerControllers[currentPlayerId];
+        currentPlayer.remaingActions = currentPlayer.maximumActionsPerTurn;
+        stateMachine.SetState(new PlayerTurnState(currentPlayer, this));
+    }
 }
 

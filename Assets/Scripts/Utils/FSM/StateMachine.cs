@@ -6,6 +6,7 @@ using UnityEngine;
 public class StateMachine
 {
     public State currentState;
+    
     public StateMachine()
     {
         SetState(new State());
